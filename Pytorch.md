@@ -92,6 +92,9 @@ plt.plot(x, y2, linestyle="--", label="cos")
 ---
 ## 常用操作
 ```python
+np.random.rand(0, 1000);  # 随机取数
+np.random.randn(0, 1000);  # 正态分布
+
 X = np.array([1, 2, 3, 4, 5, 6])
 print(X[np.array([1, 3, 5])])  # 使用np.array访问指定的元素
 
@@ -99,7 +102,7 @@ print(X % 2 == 0)
 # 使用dtype为bool类型的np.array访问指定的元素(取出True对应的元素)
 # X % 2 == 0:[False  True False  True False  True]
 print(X[X % 2 == 0])
-```
+
 plt.xlabel("x")
 plt.ylabel("y")
 plt.title("sin & cos")
