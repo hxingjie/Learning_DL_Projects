@@ -92,8 +92,9 @@ plt.plot(x, y2, linestyle="--", label="cos")
 ---
 ## 常用操作
 ```python
-np.random.rand(0, 1000);  # 随机取数
-np.random.randn(0, 1000);  # 正态分布
+np.random.rand(3, 2)  # 生成一个3行2列的数组，元素是[0, 1)之间的随机数
+np.random.randn(0, 1000)  # 生成一个3行2列的数组，元素是标准正态分布(均值为0，标准差为1)的随机数
+np.random.normal(0, 1, size=(3, 2))  # 生成一个3行2列的数组，元素是符合均值为0，标准差为1正态分布的随机数
 
 X = np.array([1, 2, 3, 4, 5, 6])
 print(X[np.array([1, 3, 5])])  # 使用np.array访问指定的元素
