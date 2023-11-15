@@ -1,0 +1,349 @@
+# Project_4
+
+---
+
+## 1.损失函数
+
+---
+
+```python
+import numpy as np
+
+def mean_square_loss(y_pred, y):
+    return 0.5 * np.sum((y_pred - y) ** 2)
+
+def cross_entropy_cross(y_pred, y):
+    delta = 1e-7
+    return -np.sum(y * np.log(y_pred + delta))
+```
+
+---
+
+## 2.mini-batch
+
+---
+
+```python
+import numpy as np
+from dataset.mnist import load_mnist
+
+def cross_entropy_cross(y_pred, y):
+    if y_pred.ndim == 1:
+        y_pred = y_pred.reshape(1, y_pred.shape[0])
+        y = y.reshape(1, y.shape[0])
+    batch_size = y_pred.shape[0]
+    delta = 1e-7
+    return -np.sum(y * np.log(y_pred + delta)) / batch_size
+
+
+def cross_entropy_cross_not_onehot(y_pred, y):
+    if y_pred.ndim == 1:
+        y_pred = y_pred.reshape(1, y_pred.shape[0])
+        y = y.reshape(1, y.shape[0])
+    batch_size = y_pred.shape[0]
+    delta = 1e-7
+    return -np.sum(np.log(y_pred[np.arange(batch_size), y] + delta)) / batch_size
+
+
+(x_train, y_train), (x_test, y_test) = load_mnist(normalize=True, one_hot_label=True)
+print(x_train.shape)
+print(y_train.shape)
+
+train_size = x_train.shape[0]
+batch_size = 10
+batch_mask = np.random.choice(train_size, batch_size)  # 在[0, train_size-1]中随机选择batch_size个数字
+x_batch = x_train[batch_mask]
+y_batch = y_train[batch_mask]
+```
+
+---
+
+## 3.导数
+
+---
+
+```python
+import numpy as np
+import matplotlib.pylab as plt
+
+def func_0(x):
+    return 0.01*x ** 2 + 0.1*x
+
+def numerial(f, x):
+    h = 1e-4
+    return (f(x+h) - f(x-h)) / (2*h)
+
+print(numerial(func_0, 5.))
+print(numerial(func_0, 10.))
+
+x = np.arange(0.0, 20.0, 0.1)
+y = func_0(x)
+plt.xlabel("x")
+plt.ylabel("f(x)")
+plt.plot(x, y)
+plt.plot(x, numerial(func_0, 5.) * (x-5.) + func_0(5.))
+plt.plot(x, numerial(func_0, 10.) * (x-10.) + func_0(10.))
+plt.show()
+```
+
+---
+
+## 4.偏导数
+
+---
+
+```python
+import numpy as np
+
+def func_tmp0(x0):
+    return x0**2 + 4.0**2
+
+def func_tmp1(x1):
+    return 3.0**2 + x1**2
+
+def numerical_diff(func, x):
+    h = 1e-4
+    return (func(x+h) - func(x-h)) / (2*h)
+
+# y = x0**2 + x1**2
+# x0 = 3, x1 = 4
+print(numerical_diff(func_tmp0, 3.))
+print(numerical_diff(func_tmp1, 4.))
+```
+
+---
+
+## 5.梯度
+
+---
+
+```python
+import numpy as np
+
+def func(x):
+    return np.sum(x**2)
+
+
+def numerical_gradient(func, x):
+    h = 1e-4
+    grad = np.zeros_like(x)  # 生成和x形状相同、元素为0的数组
+    # x: [3., 4.]
+    # y = x**2
+    for idx in range(x.size):
+        tmp_val = x[idx]
+        
+        x[idx] = tmp_val + h
+        fxh1 = func(x)
+
+        x[idx] = tmp_val - h
+        fxh2 = func(x)
+
+        grad[idx] = (fxh1 - fxh2) / (2 * h)
+        
+        x[idx] = tmp_val
+
+    return grad
+
+
+x = np.array([3., 4.])
+print(numerical_gradient(func, x))
+
+x = np.array([0., 2.])
+print(numerical_gradient(func, x))
+
+x = np.array([3., 0.])
+print(numerical_gradient(func, x))
+
+```
+
+---
+
+## 6.利用梯度求函数最小值
+
+---
+
+```python
+import numpy as np
+import matplotlib.pylab as plt
+
+def func(x):
+    return np.sum(x**2)
+
+def numerical_gradient(func, x):
+    h = 1e-4
+    grad = np.zeros_like(x)  # 生成和x形状相同、元素为0的数组
+    # x: [3., 4.]
+    # y = x**2
+    for idx in range(x.size):
+        tmp_val = x[idx]
+
+        x[idx] = tmp_val + h
+        fxh1 = func(x)
+
+        x[idx] = tmp_val - h
+        fxh2 = func(x)
+
+        grad[idx] = (fxh1 - fxh2) / (2 * h)
+
+        x[idx] = tmp_val
+
+    return grad
+
+x0 = []
+x1 = []
+def gradient_descent(func, init_x, lr=0.1, step_num=100):
+    x = init_x
+    
+    x0.append(x[0])  # for draw graph
+    x1.append(x[1])  # for draw graph
+
+    for i in range(step_num):
+        grad = numerical_gradient(func, x)
+        x -= lr * grad
+        
+        x0.append(x[0])  # for draw graph
+        x1.append(x[1])  # for draw graph
+
+    return x
+
+
+init_x = np.array([-3., 4.])
+gradient_descent(func, init_x)
+
+plt.xlabel("x0")
+plt.ylabel("x1")
+plt.xlim(-4, 4)
+plt.ylim(-3, 3)
+plt.plot(x0, x1, ".")
+plt.show()
+```
+
+---
+
+### 7.实现
+
+```python
+import numpy as np
+import matplotlib.pylab as plt
+from dataset.mnist import load_mnist
+
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+
+def softmax(x):
+    c = np.max(x)
+    exp_x = np.exp(x - c)
+    sum_x = np.sum(exp_x)
+    return exp_x / sum_x
+
+
+def cross_entropy_loss(y_hat, y):
+    delta = 1e-7
+    return -np.sum(y * np.log(y_hat + delta)) / y_hat.shape[0]
+
+
+class TwoLayerNet:
+    def __init__(self, input_size, hidden_size, output_size,
+                 weight_init_std=0.01):
+        self.params = {}
+        self.params['W1'] = weight_init_std * np.random.randn(input_size, hidden_size)
+        self.params['b1'] = np.zeros(hidden_size)
+        self.params['W2'] = weight_init_std * np.random.randn(hidden_size, output_size)
+        self.params['b2'] = np.zeros(output_size)
+
+    def predict(self, x):
+        W1, W2 = self.params['W1'], self.params['W2']
+        b1, b2 = self.params['b1'], self.params['b2']
+
+        a1 = np.dot(x, W1) + b1
+        z1 = sigmoid(a1)
+        a2 = np.dot(z1, W2) + b2
+        y = softmax(a2)
+
+        return y
+
+    def loss(self, x, y):
+        y_hat = self.predict(x)
+        result = cross_entropy_loss(y_hat, y)
+        return result
+
+    def accuracy(self, x, y):
+        y_hat = self.predict(x)
+        y_hat = np.argmax(y_hat, axis=1)
+        y = np.argmax(y, axis=1)
+
+        result = np.sum(y_hat == y) / float(x.shape[0])
+        return result
+    
+    def get_numerical_gradient(self, param, x, t):
+        h = 1e-4  # 0.0001
+
+        grad = np.zeros_like(param)
+
+        it = np.nditer(param, flags=['multi_index'], op_flags=['readwrite'])
+        while not it.finished:
+            idx = it.multi_index
+            tmp_val = param[idx]
+            param[idx] = tmp_val + h
+            fxh1 = self.loss(x, t)  # f(x+h)
+
+            param[idx] = tmp_val - h
+            fxh2 = self.loss(x, t)  # f(x-h)
+            grad[idx] = (fxh1 - fxh2) / (2 * h)
+
+            param[idx] = tmp_val  # 还原值
+            it.iternext()
+
+        return grad
+
+    def numerical_gradient(self, x, t):
+        grads = {}
+        grads['W1'] = self.get_numerical_gradient(self.params['W1'], x, t)
+        grads['b1'] = self.get_numerical_gradient(self.params['b1'], x, t)
+        grads['W2'] = self.get_numerical_gradient(self.params['W2'], x, t)
+        grads['b2'] = self.get_numerical_gradient(self.params['b2'], x, t)
+
+        return grads
+
+
+net = TwoLayerNet(input_size=784, hidden_size=50, output_size=10)
+(x_train, y_train), (x_test, y_test) = load_mnist(normalize=True, one_hot_label=True)
+
+iters_num = 20
+train_size = x_train.shape[0]
+batch_size = 100
+learning_rate = 0.1
+
+train_loss_list = []
+train_acc_list = []
+test_acc_list = []
+
+net = TwoLayerNet(input_size=784, hidden_size=50, output_size=10)
+
+for i in range(iters_num):
+    batch_mask = np.random.choice(train_size, batch_size)
+    x_batch = x_train[batch_mask]
+    y_batch = y_train[batch_mask]
+
+    grad = net.numerical_gradient(x_batch, y_batch)
+
+    for key in ('W1', 'b1', 'W2', 'b2'):
+        net.params[key] -= learning_rate * grad[key]
+
+    loss = net.loss(x_batch, y_batch)
+    train_loss_list.append(loss)
+
+    if (i + 1) % 5 == 0:
+        train_acc = net.accuracy(x_train, y_train)
+        test_acc = net.accuracy(x_test, y_test)
+        train_acc_list.append(train_acc)
+        test_acc_list.append(test_acc)
+        print(f"train_acc: {train_acc}, test_acc: {test_acc}")
+
+plt.plot(np.arange(0, 20), train_loss_list)
+plt.show()
+
+```
+
