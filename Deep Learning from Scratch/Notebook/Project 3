@@ -1,0 +1,312 @@
+# Project_3
+
+---
+
+## 1.激活函数的实现
+
+---
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+def step_func(x):
+    # y = x > 0  # 生成bool类型的array
+    # return y.astype(np.int32)  # 转换numpy.array类型
+    return np.array(x > 0, dtype=np.int32)
+
+def sigmoid_func(x):
+    return 1 / (1 + np.exp(-x))  # broadcast
+
+def relu_func(x):
+    return np.maximum(0, x)
+
+x = np.arange(-5.0, 5.0, 0.1)
+y = step_func(x)
+y = sigmoid_func(x)
+
+plt.plot(x, y, label="step_func")
+plt.ylim(-0.1, 1.1)  # 指定y轴的范围
+plt.title("step_func")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.show()
+```
+
+---
+
+## 2.多维数组的运算
+
+---
+
+### 一维数组 
+
+```python
+import numpy as np
+
+x = np.array([1, 2, 3, 4])
+print(x)
+print(x.ndim)
+print(x.shape)
+print(x.shape[0])
+```
+
+---
+
+### 二维数组 
+
+```python
+import numpy as np
+
+x = np.array([[1, 2], [3, 4], [5, 6]])
+print(x)
+print(np.ndim(x))
+print(x.shape)
+print(x.shape[0])
+```
+
+---
+
+### 矩阵乘法
+
+```python
+import numpy as np
+x = np.array([[1, 2], [3, 4]])
+y = np.array([[5, 6], [7, 8]])
+print(np.dot(x, y))
+
+x = np.array([[1, 2, 3], [4, 5, 6]])
+y = np.array([[1, 2], [3, 4], [5, 6]])
+print(np.dot(x, y))
+
+# x1, x2 -> y1, y2, y3 全连接
+x = np.array([1, 2])  # (2,)
+w = np.array([[1, 3, 5], [2, 4, 6]])  # (2, 3)
+y = np.dot(x, w)  # (3,)
+print(y.shape)
+```
+
+---
+
+## 3.三层神经网络的实现
+
+---
+
+### 原始代码
+
+```python
+import numpy as np
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+
+def identity_func(x):
+    return x
+
+
+X = np.array([1., 0.5])  # (2,)
+W1 = np.array([[0.1, 0.3, 0.5], [0.2, 0.4, 0.6]])  # (2, 3)
+B1 = np.array([0.1, 0.2, 0.3])  # (3,)
+
+A1 = np.dot(X, W1) + B1  # (3,)
+Z1 = sigmoid(A1)  # (3,)
+
+W2 = np.array([[0.1, 0.4], [0.2, 0.5], [0.3, 0.6]])  # (3, 2)
+B2 = np.array([0.1, 0.2])  # (2,)
+
+A2 = np.dot(Z1, W2) + B2  # (2,)
+Z2 = sigmoid(A2)  # (2,)
+
+W3 = np.array([[0.1, 0.3], [0.2, 0.4]])  # (2, 2)
+B3 = np.array([0.1, 0.2])  # (2,)
+
+A3 = np.dot(Z2, W3) + B3
+Y = identity_func(A3)
+print(Y)
+
+
+
+
+```
+
+---
+
+### 打包代码
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+def sigmoid(x):
+    return 1 / (1+np.exp(-x))
+
+
+def identity_func(x):
+    return x
+
+
+def init_network():
+    network = {}
+    network['W1'] = np.array([[0.1, 0.3, 0.5], [0.2, 0.4, 0.6]])  # (2, 3)
+    network['b1'] = np.array([0.1, 0.2, 0.3])  # (3,)
+    network['W2'] = np.array([[0.1, 0.4], [0.2, 0.5], [0.3, 0.6]])  # (3, 2)
+    network['b2'] = np.array([0.1, 0.2])  # (2,)
+    network['W3'] = np.array([[0.1, 0.3], [0.2, 0.4]])  # (2, 2)
+    network['b3'] = np.array([0.1, 0.2])  # (2,)
+
+    return network
+
+
+def forward(network, x):
+    W1, W2, W3 = network['W1'], network['W2'], network['W3']
+    b1, b2, b3 = network['b1'], network['b2'], network['b3']
+
+    a1 = np.dot(x, W1) + b1
+    z1 = sigmoid(a1)
+
+    a2 = np.dot(z1, W2) + b2
+    z2 = sigmoid(a2)
+
+    a3 = np.dot(z2, W3) + b3
+    y = identity_func(a3)
+    
+    return y
+
+
+network = init_network()
+x = np.array([1.0, 0.5])
+y = forward(network, x)
+print(y)
+```
+
+---
+
+### softmax函数
+
+```python
+import numpy as np
+def softmax(a):
+    exp_a = np.exp(a)
+    sum_a = np.sum(exp_a)
+    y = exp_a / sum_a
+    
+    return y
+
+def softmax(a):
+    c = np.max(a)
+    exp_a = np.exp(a-c)  # 防止溢出
+    sum_a = np.sum(exp_a)
+    y = exp_a / sum_a
+
+    return y
+```
+
+## 4.手写数字识别
+
+---
+
+### 文件结构
+
+```python
+# ./dataset:
+#     ./mnist.pkl
+#     ./mnist.py
+#     ./t10k-images-idx3-ubyte.gz
+#     ./t10k-labels-idx1-ubyte.gz
+#     ./train-images-idx3-ubyte.gz
+#     ./train-labels-idx1-ubyte.gz
+# ./sample_weight.pkl
+# ./mnist_show.py
+# ./test.py
+```
+
+---
+
+### 代码实现
+
+```python
+# ./test.py
+import pickle
+import numpy as np
+from dataset.mnist import load_mnist
+
+def get_data():
+    (x_train, l_train), (x_test, l_test) = load_mnist(normalize=True, flatten=True, one_hot_label=False)
+    return x_test, l_test
+
+
+def init_network():
+    with open("sample_weight.pkl", "rb") as f:
+        network = pickle.load(f)
+
+    return network
+
+
+def sigmoid(x):
+    return 1 / (1+np.exp(-x))
+
+
+def softmax(a):
+    c = np.max(a)
+    exp_a = np.exp(a-c)  # 防止溢出
+    sum_a = np.sum(exp_a)
+    y = exp_a / sum_a
+
+    return y
+
+
+def predict(network, x):
+    W1, W2, W3 = network['W1'], network['W2'], network['W3']
+    b1, b2, b3 = network['b1'], network['b2'], network['b3']
+
+    a1 = np.dot(x, W1) + b1
+    z1 = sigmoid(a1)
+
+    a2 = np.dot(z1, W2) + b2
+    z2 = sigmoid(a2)
+
+    a3 = np.dot(z2, W3) + b3
+    y = softmax(a3)
+
+    return y
+
+
+# 单张图片
+x, l = get_data()
+network = init_network()
+
+accuracy_cnt = 0
+
+for i in range(len(x)):
+    y = predict(network, x[i])
+    index = np.argmax(y)  # return maximum value's index
+    if index == l[i]:
+        accuracy_cnt += 1
+
+print(f"Accuracy: {float(accuracy_cnt) / len(x)}")
+
+
+# 批量处理
+x, l = get_data()
+network = init_network()
+
+batch_size = 100
+accuracy_cnt = 0
+
+for i in range(0, len(x), batch_size):
+    x_batch = x[i:i+batch_size]
+    y_batch = predict(network, x_batch)
+    index = np.argmax(y_batch, axis=1)  # return maximum value's index
+    accuracy_cnt += np.sum(index == l[i:i+batch_size])
+
+print(f"Accuracy: {float(accuracy_cnt) / len(x)}")
+```
+
+---
+
