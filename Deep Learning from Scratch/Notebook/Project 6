@@ -1,0 +1,159 @@
+## 1. 不同的参数更新方法
+
+```python
+import numpy as np
+
+
+class SGD:
+    def __init__(self, lr=0.01):
+        self.lr = lr
+
+    def update(self, params, grads):
+        for key in params.keys():
+            params[key] -= self.lr * grads[key]
+
+
+class Momentum:
+    def __init__(self, lr=0.01, momentum=0.9):
+        self.lr = lr
+        self.momentum = momentum
+        self.v = None
+        pass
+
+    def update(self, params, grads):
+        if self.v is None:
+            self.v = {}
+            for key, value in params.items():
+                self.v[key] = np.zeros_like(value)
+
+        for key in params.keys():
+            self.v = self.momentum * self.v - self.lr * grads[key]
+            params[key] += self.v
+
+
+class AdaGrad:
+    def __int__(self, lr=0.01):
+        self.lr = lr
+        self.h = None
+        pass
+
+    def update(self, params, grads):
+        if self.h is None:
+            self.h = {}
+            for key, value in params.items():
+                self.h[key] = np.zeros_like(value)
+
+        for key in grads:
+            self.h[key] += grads[key] * grads[key]
+            params[key] -= self.lr / (np.sqrt(self.h[key])+1e-7) * grads[key]
+
+
+class Adam:
+    def __init__(self, lr=0.001, beta1=0.9, beta2=0.999):
+        self.lr = lr
+        self.beta1 = beta1
+        self.beta2 = beta2
+        self.iter = 0
+        self.m = None
+        self.v = None
+
+    def update(self, params, grads):
+        if self.m is None:
+            self.m, self.v = {}, {}
+            for key, val in params.items():
+                self.m[key] = np.zeros_like(val)
+                self.v[key] = np.zeros_like(val)
+
+        self.iter += 1
+        lr_t = self.lr * np.sqrt(1.0 - self.beta2**self.iter) / (1.0 - self.beta1**self.iter)
+
+        for key in params.keys():
+            self.m[key] += (1 - self.beta1) * (grads[key] - self.m[key])
+            self.v[key] += (1 - self.beta2) * (grads[key]**2 - self.v[key])
+
+            params[key] -= lr_t * self.m[key] / (np.sqrt(self.v[key]) + 1e-7)
+```
+
+## 2.Batch Normalization
+
+```python
+x = np.random.rand(1, 20)
+print(x)
+x.sort()
+print(x)
+
+avg_x = np.sum(x) / x.shape[1]
+print(avg_x)
+z = np.sum((x-avg_x)**2) / x.shape[1]
+print(z)
+
+x = (x - avg_x) / np.sqrt(z+1e-7)  # Batch Normalization
+print(x)
+
+avg_x = np.sum(x) / x.shape[1]
+print(avg_x)
+z = np.sum((x-avg_x)**2) / x.shape[1]
+print(z)
+```
+
+## 3.抑制过拟合的正则化技术
+
+```python
+import numpy as np
+
+
+class Dropout:
+    def __init__(self, dropout_ratio=0.5):
+        self.dropout_ratio = dropout_ratio
+        self.mask = None
+
+    def forward(self, x, train_flg=True):
+        if train_flg:
+            self.mask = np.random.rand(*x.shape) > self.dropout_ratio
+            return x * self.mask
+        else:
+            return x * (1.0 - self.dropout_ratio)
+
+    def backward(self, dout):
+        return dout * self.mask
+
+class MultiLayerNet:
+    def __init__(self, weight_decay_lambda=0):
+        # ...
+        self.weight_decay_lambda = weight_decay_lambda
+
+    def loss(self, x, t):
+        y = self.predict(x)
+
+        weight_decay = 0
+        for idx in range(1, self.hidden_layer_num + 2):
+            W = self.params['W' + str(idx)]
+            weight_decay += 0.5 * self.weight_decay_lambda * np.sum(W ** 2)
+
+        return self.last_layer.forward(y, t) + weight_decay
+
+    def gradient(self, x, t):
+        # forward
+        self.loss(x, t)
+
+        # backward
+        dout = 1
+        dout = self.last_layer.backward(dout)
+
+        layers = list(self.layers.values())
+        layers.reverse()
+        for layer in layers:
+            dout = layer.backward(dout)
+
+        # 设定
+        grads = {}
+        for idx in range(1, self.hidden_layer_num + 2):
+            grads['W' + str(idx)] = self.layers['Affine' + str(idx)].dW + self.weight_decay_lambda * self.layers[
+                'Affine' + str(idx)].W
+            grads['b' + str(idx)] = self.layers['Affine' + str(idx)].db
+
+        return grads
+```
+
+
+
