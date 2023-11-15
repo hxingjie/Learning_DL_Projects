@@ -1,0 +1,116 @@
+# Project_1
+
+---
+
+## numpy
+
+---
+
+### 1.一维向量
+
+```python
+import numpy as np
+x = np.array([1.0, 2.0, 3.0])
+print(type(x))  # <class 'numpy.ndarray'>
+
+y = np.array([2.0, 4.0, 6.0])
+x+y, x-y, x*y, x/y  # base cal
+
+x/2  # broadcast
+```
+
+---
+
+### 2.二维矩阵
+
+```python
+import numpy as np
+
+x = np.array([[1, 2], [3, 4]])
+y = np.array([[3, 0], [0, 6]])
+print(x.shape)
+print(x.dtype)
+
+print(x + y)  # 对应元素相加
+print(x * y)  # 对应元素相乘
+print(x * 10)  # broadcast
+```
+
+---
+
+### 3.广播机制
+
+```python
+import numpy as np
+x = np.array([[1, 2], [3, 4]])  # (2, 2)
+y = np.array([10, 20])  # (2,) - > (2, 2)
+
+print(x * y)  # y被扩展成 [[10, 20], [10, 20]]
+```
+
+---
+
+### 4.访问元素
+
+```python
+import numpy as np
+X = np.array([[1, 2], [3, 4], [5, 6]])
+print(X)
+print(X[0])
+print(X[0][1])
+
+for row in X:
+    print(row)
+
+X = X.flatten()  # 转换成一维数组
+print(X)
+
+print(X[np.array([1, 3, 5])])  # 使用np.array访问指定的元素
+
+print(X % 2 == 0)
+# 使用dtype为bool类型的np.array访问指定的元素(取出True对应的元素)
+# X % 2 == 0:[False  True False  True False  True]
+print(X[X % 2 == 0])
+```
+
+---
+
+## Matplotlib
+
+---
+
+### 1.绘制简单图形
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.arange(0, 6, 0.1, dtype=float)  # [0, 6), 步长为0.1
+y1 = np.sin(x)
+y2 = np.cos(x)
+
+plt.plot(x, y1, linestyle="-", label="sin")
+plt.plot(x, y2, linestyle="--", label="cos")
+
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("sin & cos")
+plt.legend()  # 添加图例
+plt.show()
+```
+
+---
+
+### 2.显示图像
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.image import imread
+
+img = imread("./lena.png")
+plt.imshow(img)
+
+plt.show()
+```
+
