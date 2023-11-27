@@ -75,6 +75,8 @@ np.dot(x, y) -> array
 
 x = x.flatten()  # 转换成一维数组
 np.argmax(y)  # return maximum value's index
+
+np.c_[x, y]  # 对应元素组合为列表，再组合为高一维的列表
 ```
 ---
 ## 绘图
