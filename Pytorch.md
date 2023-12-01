@@ -77,6 +77,9 @@ x = x.flatten()  # 转换成一维数组
 np.argmax(y)  # return maximum value's index
 
 np.c_[x, y]  # 对应元素组合为列表，再组合为高一维的列表
+
+torch.equal()函数接受两个张量作为输入，返回一个布尔值
+torch.eq()函数接受两个张量作为输入，返回一个新的布尔张量
 ```
 ---
 ## 绘图
