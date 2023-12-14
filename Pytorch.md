@@ -36,9 +36,6 @@ self.features = nn.Sequential(
 sigmoid + BCEloss
 softmax + CrossEntropyLoss, 注意，pytorch中的CrossEntropyLoss已经集成了softmax
 
-torch.eq(tensor1, tensor2) -> tensor_bool
-torch.equal(tensor1, tensor2) -> bool
-
 torch.nn.Linear()
 torch.nn.Conv()
 
@@ -50,14 +47,19 @@ torch.nn.AdaptiveAvgPool2d()
 torch.concat((tensor1, tensor2, ...), dim=channel)
 torch.flatten(tensor1)
 
-```
----
-## 基本函数
-```python
 x.shape
 x.shape[0]
 x.reshape(2,3)
 x.size
+x.ndim
+
+torch.sum()
+torch.mean()
+
+tensor.permute(1, 0)
+tensor.clone()
+tensor.detach()
+tensor.numpy()
 
 torch.equal()函数接受两个张量作为输入，返回一个布尔值
 torch.eq()函数接受两个张量作为输入，返回一个新的布尔张量
@@ -67,9 +69,17 @@ torch.matmul(c, W)  # 矩阵乘法
 
 print(h.data)  # return tensor
 print(h.item())  # return a number, h must only has one element
+```
+---
+## 基本函数
+```python
+x.shape
+x.shape[0]
+x.reshape(2,3)
+x.size
 
 x = np.array([1, 2, 3, 4])
-np.arange(-5.0, 5.0, 0.1) -> array
+np.arange(-5.0, 5.0, 0.1) -> numpy.array
 np.maximum(0, x) -> array
 np.exp(-x) -> array
 print(x, type(x), np.ndim(x), x.shape, x.shape[0])
@@ -99,6 +109,7 @@ y2 = np.cos(x)
 
 plt.plot(x, y1, linestyle="-", label="sin")
 plt.plot(x, y2, linestyle="--", label="cos")
+plt.show()
 ```
 ---
 ## 常用操作
