@@ -59,6 +59,15 @@ x.shape[0]
 x.reshape(2,3)
 x.size
 
+torch.equal()函数接受两个张量作为输入，返回一个布尔值
+torch.eq()函数接受两个张量作为输入，返回一个新的布尔张量
+
+torch.randn((7, 3))  # 从标准正态分布中取数，size = (7, 3)
+torch.matmul(c, W)  # 矩阵乘法
+
+print(h.data)  # return tensor
+print(h.item())  # return a number, h must only has one element
+
 x = np.array([1, 2, 3, 4])
 np.arange(-5.0, 5.0, 0.1) -> array
 np.maximum(0, x) -> array
@@ -77,9 +86,6 @@ x = x.flatten()  # 转换成一维数组
 np.argmax(y)  # return maximum value's index
 
 np.c_[x, y]  # 对应元素组合为列表，再组合为高一维的列表
-
-torch.equal()函数接受两个张量作为输入，返回一个布尔值
-torch.eq()函数接受两个张量作为输入，返回一个新的布尔张量
 ```
 ---
 ## 绘图
