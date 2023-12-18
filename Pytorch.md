@@ -53,6 +53,9 @@ x.reshape(2,3)
 x.size
 x.ndim
 
+h.unsqueeze(2)  # 在dim=2增加维度
+h.repeat(1, 1+neg_sz, 1)  # 复制，参数是指对应维度复制多少次
+
 torch.sum()
 torch.mean()
 
