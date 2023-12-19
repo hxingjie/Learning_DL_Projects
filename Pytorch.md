@@ -72,6 +72,49 @@ torch.matmul(c, W)  # 矩阵乘法
 
 print(h.data)  # return tensor
 print(h.item())  # return a number, h must only has one element
+
+# to gpu
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # gpu
+context, sample, label = context.to(device), sample.to(device), label.to(device)
+outputs = model(context, sample)
+
+loss = criterion(outputs, label)
+optimizer.zero_grad()
+loss.backward()
+optimizer.step()
+
+```
+---
+## 数据处理
+```python
+from torch.utils.data import Dataset
+from torch.utils.data import DataLoader
+
+class MyDataset(Dataset):
+    def __init__(self, contexts, target, neg_samples):
+        self.contexts = torch.LongTensor(contexts)  # (Seq, window_size * 2)
+        
+        target = torch.LongTensor(target)  # (Seq, )
+        target = target.reshape(-1, 1)  # (Seq, 1)
+        neg_samples = torch.LongTensor(neg_samples)  # (Seq, neg_sz)
+        self.samples = torch.concat((target, neg_samples), dim=1)  # (Seq, 1+neg_sz)
+        
+        labels = [1] + [0 for _ in range(NEG_SZ)]
+        labels = torch.Tensor(labels)  # (1+neg_sz*0)
+        labels = labels.unsqueeze(dim=0)
+        self.labels = labels.repeat(len(contexts), 1)  # (Seq, 1+neg_sz)
+        
+        self.len = len(contexts)
+
+    def __getitem__(self, index):
+        return self.contexts[index], self.samples[index], self.labels[index]
+
+    def __len__(self):
+        return self.len
+
+train_dataset = MyDataset(contexts, target, neg_samples)
+train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+
 ```
 ---
 ## 基本函数
@@ -99,6 +142,10 @@ x = x.flatten()  # 转换成一维数组
 np.argmax(y)  # return maximum value's index
 
 np.c_[x, y]  # 对应元素组合为列表，再组合为高一维的列表
+
+np.random.rand(3, 2)  # 生成一个3行2列的数组，元素是[0, 1)之间的随机数
+np.random.randn(0, 1000)  # 生成一个3行2列的数组，元素是标准正态分布(均值为0，标准差为1)的随机数
+np.random.normal(0, 1, size=(3, 2))  # 生成一个3行2列的数组，元素是符合均值为0，标准差为1正态分布的随机数
 ```
 ---
 ## 绘图
@@ -110,6 +157,12 @@ x = np.arange(0, 6, 0.1, dtype=float)  # [0, 6), 步长为0.1
 y1 = np.sin(x)
 y2 = np.cos(x)
 
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("sin & cos")
+plt.legend()  # 添加图例
+plt.show()
+
 plt.plot(x, y1, linestyle="-", label="sin")
 plt.plot(x, y2, linestyle="--", label="cos")
 plt.show()
@@ -117,10 +170,6 @@ plt.show()
 ---
 ## 常用操作
 ```python
-np.random.rand(3, 2)  # 生成一个3行2列的数组，元素是[0, 1)之间的随机数
-np.random.randn(0, 1000)  # 生成一个3行2列的数组，元素是标准正态分布(均值为0，标准差为1)的随机数
-np.random.normal(0, 1, size=(3, 2))  # 生成一个3行2列的数组，元素是符合均值为0，标准差为1正态分布的随机数
-
 X = np.array([1, 2, 3, 4, 5, 6])
 print(X[np.array([1, 3, 5])])  # 使用np.array访问指定的元素
 
@@ -129,9 +178,5 @@ print(X % 2 == 0)
 # X % 2 == 0:[False  True False  True False  True]
 print(X[X % 2 == 0])
 
-plt.xlabel("x")
-plt.ylabel("y")
-plt.title("sin & cos")
-plt.legend()  # 添加图例
-plt.show()
+
 ```
