@@ -1,7 +1,6 @@
 # CAP 4
-
 ---
-
+## Word2vec, CBOW
 **src.py**
 
 ```python
