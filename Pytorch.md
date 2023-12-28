@@ -83,6 +83,23 @@ optimizer.zero_grad()
 loss.backward()
 optimizer.step()
 
+# save and load tensor
+model = model.to(torch.device('cpu'))
+torch.save(model.in_embed.weight.clone().detach(), 'in_embed.pth')
+word_vecs = torch.load('in_embed.pth')
+
+# save and load model
+# 1
+torch.save(model, 'lstm_model.pth')
+model = torch.load('lstm_model.pth')
+
+# 2
+torch.save(model.state_dict(), 'lstm_state_dict.pth')
+
+state_dict = torch.load('lstm_state_dict.pth')
+model = RNNlm(vocab_size, HIDDEN_SIZE)
+model.load_state_dict(state_dict)
+
 ```
 ---
 ## 数据处理
