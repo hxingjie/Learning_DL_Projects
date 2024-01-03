@@ -39,6 +39,20 @@ softmax + CrossEntropyLoss, 注意，pytorch中的CrossEntropyLoss已经集成�
 torch.nn.Linear()
 torch.nn.Conv()
 
+torch.nn.LSTM()
+# xs: L, N, H_{in}
+# h_0: D * num_layers, N, H_{out}
+# c_0: D * num_layers, N, H_{cell}
+
+# outs: L, N, D * H_{out}, D * H_{out}:(forward, reverse)
+# h_n: D * num_layers, N, H_{out}, D * num_layers: (layer1's forward, layer1's reverse, layer2's forward, layer2's reverse)
+# c_n: D * num_layers, N, H_{cell}
+h_0 = torch.zeros(self.num_layers * (2 if self.bi else 1), N, self.H).to(gpu)
+c_0 = torch.zeros_like(h_0).to(gpu)
+outs, (hn, cn) = self.lstm(xs, (h_0, c_0))
+print(outs[-1, -1, :HIDDEN_SIZE].eq(hn[-2, -1]))
+print(outs[0, -1, HIDDEN_SIZE:].eq(hn[-1, -1]))
+
 torch.nn.MaxPool2d()
 torch.nn.AvgPool2d()
 torch.nn.AdaptiveMaxPool2d()
