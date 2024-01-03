@@ -1,24 +1,12 @@
 ## pytorch
 ```python
-X = torch.Tensor()  # 创建Tensor，默认float类型的Tensor
-
-X = torch.tensor()  # 创建Tensor，使用函数创建
-函数原型为def tensor(data: Any, dtype: Optional[_dtype]=None, device: Device=None, requires_grad: _bool=False) -> Tensor: ...
-
-X.require_grad = True  # 直接设置属性
-X.require_grad_(True)  # 通过方法设置属性
-
-X.grad  # 获取梯度，也是Tensor
-X.data  # 获取值
-X.item()  # 获取值
-
-optimizer.zero_grad()
-outputs = net(images.to(device))
+# 梯度更新
 loss = loss_function(outputs, labels.to(device))
+optimizer.zero_grad()
 loss.backward()
 optimizer.step()
 
-# 卷积、池化
+# 卷积、池化的维度计算
 # N = (W - F + (P_row + P_col)) / S + 1
 # 卷积 padding = size // 2
 # 最大池化 padding = (size - 1) // 2
@@ -32,10 +20,11 @@ self.features = nn.Sequential(
     nn.MaxPool2d(kernel_size=3, stride=2)
 )
 
-# 二分类
+# 激活函数的选择
 sigmoid + BCEloss
 softmax + CrossEntropyLoss, 注意，pytorch中的CrossEntropyLoss已经集成了softmax
 
+# 常用层
 torch.nn.Linear()
 torch.nn.Conv()
 
@@ -58,43 +47,16 @@ torch.nn.AvgPool2d()
 torch.nn.AdaptiveMaxPool2d()
 torch.nn.AdaptiveAvgPool2d()
 
+# share weights
 self.fc1 = torch.nn.Linear(in_features=hidden_size, out_features=vocab_size)
 self.fc1.weight.data = self.fc0.weight.data  # share weights
 # torch.nn.Linear的weight为[out_features, hidden_size]
 
-torch.concat((tensor1, tensor2, ...), dim=channel)
-torch.flatten(tensor1)
-
-x.shape
-x.shape[0]
-x.reshape(2,3)
-x.size
-x.ndim
-
-h.unsqueeze(2)  # 在dim=2增加维度
-h.repeat(1, 1+neg_sz, 1)  # 复制，参数是指对应维度复制多少次
-
-torch.sum()
-torch.mean()
-
-tensor.permute(1, 0)
-tensor.clone()
-tensor.detach()
-tensor.numpy()
-
-torch.equal()函数接受两个张量作为输入，返回一个布尔值
-torch.eq()函数接受两个张量作为输入，返回一个新的布尔张量
-
-torch.randn((7, 3))  # 从标准正态分布中取数，size = (7, 3)
-torch.matmul(c, W)  # 矩阵乘法
-
-print(h.data)  # return tensor
-print(h.item())  # return a number, h must only has one element
-
-# to gpu
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # gpu
-context, sample, label = context.to(device), sample.to(device), label.to(device)
-outputs = model(context, sample)
+# translate to gpu
+CPU = torch.device('cpu')
+GPU = torch.device('cuda:0')
+tensor.to(device)
+model.to(device)
 
 loss = criterion(outputs, label)
 optimizer.zero_grad()
@@ -120,39 +82,80 @@ model.load_state_dict(state_dict)
 
 ```
 ---
+## pytorch 常用函数
+```python
+X = torch.Tensor()  # 创建Tensor，默认float类型的Tensor
+X = torch.LongTensor()  # 创建Tensor，LongTensor类型的Tensor
+
+X = torch.tensor()  # 创建Tensor，使用函数创建
+函数原型为def tensor(data: Any, dtype: Optional[_dtype]=None, device: Device=None, requires_grad: _bool=False) -> Tensor: ...
+
+X.require_grad = True  # 直接设置属性
+X.require_grad_(True)  # 通过方法设置属性
+
+torch.concat((tensor1, tensor2, ...), dim=channel)
+torch.flatten(tensor1)
+
+x.shape
+x.shape[0]
+x.size
+x.ndim
+
+h.unsqueeze(2)  # 在dim=2增加维度
+x.reshape(2,3)
+h.repeat(1, 1+neg_sz, 1)  # 复制，参数是指对应维度复制多少次
+
+torch.sum(dim=2)
+torch.mean(dim=2)
+
+tensor.permute(1, 0, 2)
+tensor.clone()
+tensor.detach()
+tensor.numpy()
+
+torch.equal()函数接受两个张量作为输入，返回一个布尔值
+torch.eq()函数接受两个张量作为输入，返回一个新的布尔张量
+
+torch.randn((7, 3))  # 从标准正态分布中取数，size = (7, 3)
+torch.matmul(c, W)  # 矩阵乘法
+
+Tensor.data  # return tensor
+Tensor.item()  # return a number, h must only has one element
+Tensor.grad  # 获取梯度
+
+with torch.no_grad()
+    ...
+    ...
+```
+---
 ## 数据处理
 ```python
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 
 class MyDataset(Dataset):
-    def __init__(self, contexts, target, neg_samples):
-        self.contexts = torch.LongTensor(contexts)  # (Seq, window_size * 2)
-        
-        target = torch.LongTensor(target)  # (Seq, )
-        target = target.reshape(-1, 1)  # (Seq, 1)
-        neg_samples = torch.LongTensor(neg_samples)  # (Seq, neg_sz)
-        self.samples = torch.concat((target, neg_samples), dim=1)  # (Seq, 1+neg_sz)
-        
-        labels = [1] + [0 for _ in range(NEG_SZ)]
-        labels = torch.Tensor(labels)  # (1+neg_sz*0)
-        labels = labels.unsqueeze(dim=0)
-        self.labels = labels.repeat(len(contexts), 1)  # (Seq, 1+neg_sz)
-        
-        self.len = len(contexts)
+    def __init__(self, questions, answers):
+        # questions:(N, L_q)
+        # answers:(N, L_a)
+        self.questions = torch.LongTensor(questions)
+        self.answers = torch.LongTensor(answers)
+
+        self.questions = self.questions.flip(dims=[1])  # reverse inputs
+
+        self.len = len(questions)
 
     def __getitem__(self, index):
-        return self.contexts[index], self.samples[index], self.labels[index]
-
+        return self.questions[index], self.answers[index]
+    
     def __len__(self):
         return self.len
 
-train_dataset = MyDataset(contexts, target, neg_samples)
+train_dataset = MyDataset(x_train, t_train)
 train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-
+train_data_len = len(train_dataset)
 ```
 ---
-## 基本函数
+## numpy
 ```python
 x.shape
 x.shape[0]
@@ -210,7 +213,7 @@ print(X[np.array([1, 3, 5])])  # 使用np.array访问指定的元素
 
 print(X % 2 == 0)
 # 使用dtype为bool类型的np.array访问指定的元素(取出True对应的元素)
-# X % 2 == 0:[False  True False  True False  True]
+# X % 2 == 0: [False  True False  True False  True]
 print(X[X % 2 == 0])
 
 ```
@@ -227,6 +230,12 @@ PyTorch 中通常会出现此错误。
 PyTorch 张量不支持负步幅，
 因此解决方法是在将数组转换为 PyTorch 张量之前使用 array.copy() 创建数组的副本。
 '''
+---
+## other tools
+tensorboard
+wandb
+
+
 
 ```
 
