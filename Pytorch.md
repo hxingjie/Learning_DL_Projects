@@ -195,5 +195,20 @@ print(X % 2 == 0)
 # X % 2 == 0:[False  True False  True False  True]
 print(X[X % 2 == 0])
 
+```
+---
+## some bug
+```python
+(x_train, t_train), (x_test, t_test) = \
+    sequence.load_data('addition.txt', seed=1984)
+x_train, x_test = x_train[:, ::-1], x_test[:, ::-1]  # reverse
+x_train, x_test = x_train.copy(), x_test.copy()  # copy
+'''
+当您尝试从具有负步长的 NumPy 数组创建张量时, 
+PyTorch 中通常会出现此错误。 
+PyTorch 张量不支持负步幅，
+因此解决方法是在将数组转换为 PyTorch 张量之前使用 array.copy() 创建数组的副本。
+'''
 
 ```
+
