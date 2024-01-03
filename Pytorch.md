@@ -44,6 +44,10 @@ torch.nn.AvgPool2d()
 torch.nn.AdaptiveMaxPool2d()
 torch.nn.AdaptiveAvgPool2d()
 
+self.fc1 = torch.nn.Linear(in_features=hidden_size, out_features=vocab_size)
+self.fc1.weight.data = self.fc0.weight.data  # share weights
+# torch.nn.Linear的weight为[out_features, hidden_size]
+
 torch.concat((tensor1, tensor2, ...), dim=channel)
 torch.flatten(tensor1)
 
