@@ -1,0 +1,27 @@
+# Deep learning
+
+## normalization
+1.Feature Scaling (Min-Max Scaling):
+Feature scaling, also known as Min-Max scaling, scales the input features to a specific range, usually [0, 1]. The formula for Min-Max scaling is:
+
+This ensures that all feature values are within the [0, 1] range.
+X = (X-Xmin) / (Xmax - Xmin)
+
+2.Z-score Normalization (Standardization):
+Z-score normalization, also known as standardization, transforms the input features to have a mean of 0 and a standard deviation of 1. The formula for Z-score normalization is:
+X = X-μ /  σ
+where μ is the mean of the feature, and σ is the standard deviation.
+
+Normalization is beneficial for several reasons:
+
+Faster Convergence: Normalized inputs can speed up the convergence of optimization algorithms during training.
+
+Numerical Stability: Normalization helps prevent numerical instability, especially when using activation functions like sigmoid or tanh.
+
+Equalizes Learning Rates: Normalization ensures that all features contribute more equally to the learning process.
+
+Improved Generalization: It can help prevent the model from overfitting to specific features.
+
+Normalization is commonly applied to the input features of neural networks, especially in cases where the features have different scales. 
+In deep learning frameworks like TensorFlow and PyTorch, normalization layers (e.g., Batch Normalization) are also used within the neural 
+network architecture to normalize the activations at different layers during training.
