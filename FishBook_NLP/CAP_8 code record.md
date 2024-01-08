@@ -626,9 +626,9 @@ draw_pict(correct_rate_list, 0, EPOCH)
 
 ![date_without_attention](./.asset/date_without_attention.png)
 
-![date_attention](.\.asset\date_attention.png)
+![date_attention](./.asset/date_attention.png)
 
-![date_attention_heatmap](.\.asset\date_attention_heatmap.png)
+![date_attention_heatmap](./.asset/date_attention_heatmap.png)
 
 ---
 
