@@ -205,19 +205,18 @@ np.random.normal(0, 1, size=(3, 2))  # 生成一个3行2列的数组，元素是
 import numpy as np
 import matplotlib.pyplot as plt
 
-x = np.arange(0, 6, 0.1, dtype=float)  # [0, 6), 步长为0.1
-y1 = np.sin(x)
-y2 = np.cos(x)
+def draw_pict(y_data):
+    x = np.arange(0, len(y_data), 1, dtype=np.int32)
+    y = np.array(y_data)
 
-plt.xlabel("x")
-plt.ylabel("y")
-plt.title("sin & cos")
-plt.legend()  # 添加图例
-plt.show()
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.title("x & y")
+    plt.legend()  # 添加图例
+    plt.plot(x, y, linestyle='-')
 
-plt.plot(x, y1, linestyle="-", label="sin")
-plt.plot(x, y2, linestyle="--", label="cos")
-plt.show()
+    plt.show()
+
 ```
 ---
 ## 6.常用操作
