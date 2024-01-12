@@ -1,30 +1,29 @@
-## pytorch
+## 1.pytorch
+
+### train & test
 ```python
-# 梯度更新
-loss = loss_function(outputs, labels.to(device))
+# train
+outpust = model(inputs)
+loss = criterion(outputs, labels)
+
 optimizer.zero_grad()
 loss.backward()
 optimizer.step()
 
-# 卷积、池化的维度计算
-# N = (W - F + (P_row + P_col)) / S + 1
-# 卷积 padding = size // 2
-# 最大池化 padding = (size - 1) // 2
+# test
+model.eval()  # 关闭dropout
+with torch.no_grad():  # 不进行梯度计算
+    outpust = model(inputs)
+    loss = criterion(outputs, labels)
+```
 
-self.features = nn.Sequential(
-    nn.ZeroPad2d((1, 2, 1, 2)),  # 左补一列, 右补两列, 上补一行, 下补两行
-    nn.Conv2d(3, 48, kernel_size=11, stride=4, padding=2)
-    # padding=2, 上下左右全部补2行(列)0
-    # padding=(1,2), 上下各补一行0, 左右各补两列0
-    nn.ReLU(inplace=True),
-    nn.MaxPool2d(kernel_size=3, stride=2)
-)
+### 激活函数的选择
+二分类: sigmoid + BCEloss
 
-# 激活函数的选择
-sigmoid + BCEloss
-softmax + CrossEntropyLoss, 注意，pytorch中的CrossEntropyLoss已经集成了softmax
+多分类: softmax + CrossEntropyLoss, 注意，pytorch中的CrossEntropyLoss已经集成了softmax
 
-# 常用层
+### 常用层
+```python
 torch.nn.Linear()
 torch.nn.Conv()
 
@@ -47,22 +46,38 @@ torch.nn.AvgPool2d()
 torch.nn.AdaptiveMaxPool2d()
 torch.nn.AdaptiveAvgPool2d()
 
-# share weights
+# 卷积、池化的维度计算
+# N = (W - F + (P_row + P_col)) / S + 1
+# 卷积 padding = size // 2
+# 最大池化 padding = (size - 1) // 2
+
+self.features = nn.Sequential(
+    nn.ZeroPad2d((1, 2, 1, 2)),  # 左补一列, 右补两列, 上补一行, 下补两行
+    nn.Conv2d(3, 48, kernel_size=11, stride=4, padding=2)
+    # padding=2, 上下左右全部补2行(列)0
+    # padding=(1,2), 上下各补一行0, 左右各补两列0
+    nn.ReLU(inplace=True),
+    nn.MaxPool2d(kernel_size=3, stride=2)
+)
+```
+
+### share weights
+```python
 self.fc1 = torch.nn.Linear(in_features=hidden_size, out_features=vocab_size)
 self.fc1.weight.data = self.fc0.weight.data  # share weights
 # torch.nn.Linear的weight为[out_features, hidden_size]
+```
 
-# translate to gpu
+### translate to gpu
+```python
 CPU = torch.device('cpu')
 GPU = torch.device('cuda:0')
 tensor.to(device)
 model.to(device)
+```
 
-loss = criterion(outputs, label)
-optimizer.zero_grad()
-loss.backward()
-optimizer.step()
-
+### save and load
+```python
 # save and load tensor
 model = model.to(torch.device('cpu'))
 torch.save(model.in_embed.weight.clone().detach(), 'in_embed.pth')
@@ -79,10 +94,9 @@ torch.save(model.state_dict(), 'lstm_state_dict.pth')
 state_dict = torch.load('lstm_state_dict.pth')
 model = RNNlm(vocab_size, HIDDEN_SIZE)
 model.load_state_dict(state_dict)
-
 ```
 ---
-## pytorch 常用函数
+## 2.pytorch 常用函数
 ```python
 X = torch.Tensor()  # 创建Tensor，默认float类型的Tensor
 X = torch.LongTensor()  # 创建Tensor，LongTensor类型的Tensor
@@ -128,7 +142,7 @@ with torch.no_grad()
     ...
 ```
 ---
-## 数据处理
+## 3.数据处理
 ```python
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
@@ -155,7 +169,7 @@ train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=
 train_data_len = len(train_dataset)
 ```
 ---
-## numpy
+## 4.numpy
 ```python
 x.shape
 x.shape[0]
@@ -186,7 +200,7 @@ np.random.randn(0, 1000)  # 生成一个3行2列的数组，元素是标准正�
 np.random.normal(0, 1, size=(3, 2))  # 生成一个3行2列的数组，元素是符合均值为0，标准差为1正态分布的随机数
 ```
 ---
-## 绘图
+## 5.绘图
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -206,7 +220,7 @@ plt.plot(x, y2, linestyle="--", label="cos")
 plt.show()
 ```
 ---
-## 常用操作
+## 6.常用操作
 ```python
 X = np.array([1, 2, 3, 4, 5, 6])
 print(X[np.array([1, 3, 5])])  # 使用np.array访问指定的元素
@@ -218,7 +232,7 @@ print(X[X % 2 == 0])
 
 ```
 ---
-## some bug
+## 7.some bug
 ```python
 (x_train, t_train), (x_test, t_test) = \
     sequence.load_data('addition.txt', seed=1984)
@@ -234,8 +248,6 @@ PyTorch 张量不支持负步幅，
 ## other tools
 tensorboard
 wandb
-
-
 
 ```
 
