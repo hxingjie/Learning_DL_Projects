@@ -151,11 +151,8 @@ class MyDataset(Dataset):
     def __init__(self, questions, answers):
         # questions:(N, L_q)
         # answers:(N, L_a)
-        self.questions = torch.LongTensor(questions)
-        self.answers = torch.LongTensor(answers)
-
-        self.questions = self.questions.flip(dims=[1])  # reverse inputs
-
+        self.questions = questions
+        self.answers = (answers
         self.len = len(questions)
 
     def __getitem__(self, index):
