@@ -95,6 +95,18 @@ state_dict = torch.load('lstm_state_dict.pth')
 model = RNNlm(vocab_size, HIDDEN_SIZE)
 model.load_state_dict(state_dict)
 ```
+
+### glove
+```python
+from torchtext.vocab import Vectors
+
+# pretrain vectors in vectors.py
+vectors = Vectors(name='glove.6B.100d.txt', cache='./glove.6B/')
+words = [word for word in word2id.keys()]
+vectors = vectors.get_vecs_by_tokens(words, lower_case_backup=True)
+self.embed = torch.nn.Embedding.from_pretrained(vectors)
+```
+
 ---
 ## 2.pytorch 常用函数
 ```python
