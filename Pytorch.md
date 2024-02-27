@@ -49,6 +49,16 @@ outs, (hn, cn) = self.lstm(xs, (h_0, c_0))
 print(outs[-1, -1, :HIDDEN_SIZE].eq(hn[-2, -1]))
 print(outs[0, -1, HIDDEN_SIZE:].eq(hn[-1, -1]))
 
+seq_lens, sorted_idx = seq_lens.sort(dim=0, descending=True)
+x, y = x[sorted_idx], y[sorted_idx]
+
+# pack && pad
+lstm_inputs = torch.nn.utils.rnn.pack_padded_sequence(input=embed_out, lengths=seq_lengths)  
+h0 = torch.zeros(self.D * self.num_layers, N, self.H)
+c0 = torch.zeros_like(h0)
+lstm_out, (hn, cn) = self.lstm(lstm_inputs, (h0, c0))  # L, N, H
+lstm_out, lengths_unpacked = torch.nn.utils.rnn.pad_packed_sequence(sequence=lstm_out, total_length=max_len)
+
 torch.nn.MaxPool2d()
 torch.nn.AvgPool2d()
 torch.nn.AdaptiveMaxPool2d()
