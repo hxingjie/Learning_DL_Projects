@@ -64,6 +64,11 @@ torch.nn.AvgPool2d()
 torch.nn.AdaptiveMaxPool2d()
 torch.nn.AdaptiveAvgPool2d()
 
+torch.nn.Dropout: 每个数按概率置0
+torch.nn.Dropout1d: 以最后一维为单位置0
+torch.nn.Dropout2d: 以最后两维为单位置0
+torch.nn.Dropout3d: 以最后三维为单位置0
+
 # 卷积、池化的维度计算
 # N = (W - F + (P_row + P_col)) / S + 1
 # 卷积 padding = size // 2
