@@ -22,7 +22,7 @@ with torch.no_grad():  # 不进行梯度计算
 MSEloss. reduction='mean' or 'sum or 'none'
 MSEloss(outs, labels). outs:(N, *), labels:(N, *)
 
-二分类: 
+回归用作分类: 
 sigmoid + BCEloss. reduction='mean' or 'sum or 'none'
 BCEloss(sigmoid(outs), labels). outs:(N, C), labels:(N, C)
 
