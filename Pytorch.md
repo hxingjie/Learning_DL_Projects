@@ -249,6 +249,18 @@ def draw_pict(y_data):
 
     plt.show()
 
+x = np.arange(10, 13, 1, dtype=np.int32)
+y1 = np.array([1, 2, 3])
+y2 = np.array([2, 4, 6])
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title('title')
+
+plt.plot(x, y1, linestyle='-', label='y1')
+plt.plot(x, y2, linestyle='-', label='y2')
+plt.legend()
+plt.show()
+
 ```
 ---
 ## 6.常用操作
