@@ -19,12 +19,14 @@ with torch.no_grad():  # 不进行梯度计算
 
 ### 激活函数的选择
 回归：
+
 MSEloss. reduction='mean' or 'sum or 'none'
-MSEloss(outs, labels). outs:(N, *), labels:(N, *)
+
+MSEloss(outs, labels). outs:(N, *) float, labels:(N, *) float
 
 回归用作分类: 
 sigmoid + BCEloss. reduction='mean' or 'sum or 'none'
-BCEloss(sigmoid(outs), labels). outs:(N, C), labels:(N, C)
+BCEloss(sigmoid(outs), labels). outs:(N, C) float, labels:(N, C) float
 
 多分类: 
 softmax + CrossEntropyLoss(pytorch中的CrossEntropyLoss已经集成了softmax). reduction='mean' or 'sum or 'none'
