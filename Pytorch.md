@@ -294,5 +294,21 @@ PyTorch 张量不支持负步幅，
 tensorboard
 wandb
 
+sentences, labels, sentences_test = read_file(train_file, test_file)
+sentences = process_stopwords(sentences)
+sentences_test = process_stopwords(sentences_test)
+
+def process_stopwords(sentences):
+    import nltk
+    #nltk.download('punkt')
+    #nltk.download('stopwords')
+    #加载英文停用词列表
+    stopwordsList = stopwords.words('english')
+    #删除停用词后的list
+    for i in range(len(sentences)):
+        tmp_l = [word for word in word_tokenize(sentences[i]) if word not in stopwordsList]
+        sentence = " ".join(tmp_l)
+        sentences[i] = sentence
+    return sentences
 ```
 
