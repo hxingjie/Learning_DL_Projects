@@ -3,7 +3,7 @@
 ### train & test
 ```python
 # train
-outpust = model(inputs)
+outputs = model(inputs)
 loss = criterion(outputs, labels)
 
 optimizer.zero_grad()
